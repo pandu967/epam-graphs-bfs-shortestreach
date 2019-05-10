@@ -1,0 +1,105 @@
+import java.io.*;
+import java.math.*;
+import java.security.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.regex.*;
+
+public class Solution {
+
+    // Complete the bfs function below.
+    static int[] bfs(int n, int m, int[][] edges, int s) {
+        ArrayList<ArrayList<Integer>>grp = new ArrayList<ArrayList<Integer>>();
+        for(int i=0;i<n+1;i++)
+            grp.add(i,new ArrayList<Integer>()); 
+        for(int i=0;i<m;i++){
+            int src = edges[i][0];
+            int des = edges[i][1];
+            grp.get(src).add(des);
+            grp.get(des).add(src);
+        }
+        int ans[] = new int[n+1];
+        boolean vis[] = new boolean[n+1];
+        Queue<Integer>que = new LinkedList<Integer>();
+        que.add(s);
+        que.add(-1);
+        int step=0;
+        while(que.size()!=0){
+            int e = que.poll();
+            if(e==-1){
+                if(que.size()==0)
+                    break;
+                step++;
+                que.add(-1);
+            }
+            else{
+                ans[e-1] = 6*step;
+                for(Integer i:grp.get(e)){
+                    if(!vis[i]){
+                        que.add(i);
+                        vis[i]=true;
+                    }
+                }
+            }
+        }
+        int res[] = new int[n-1];
+        for(int i=0;i<n;i++){
+            if(!vis[i+1])
+                ans[i] = -1;
+        }
+        int z =0;
+        for(int i=0;i<n;i++)
+            if(i+1!=s)
+                res[z++] = ans[i];
+        return res;
+    }
+
+    private static final Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+        int q = scanner.nextInt();
+        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
+
+        for (int qItr = 0; qItr < q; qItr++) {
+            String[] nm = scanner.nextLine().split(" ");
+
+            int n = Integer.parseInt(nm[0]);
+
+            int m = Integer.parseInt(nm[1]);
+
+            int[][] edges = new int[m][2];
+
+            for (int i = 0; i < m; i++) {
+                String[] edgesRowItems = scanner.nextLine().split(" ");
+                scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
+
+                for (int j = 0; j < 2; j++) {
+                    int edgesItem = Integer.parseInt(edgesRowItems[j]);
+                    edges[i][j] = edgesItem;
+                }
+            }
+
+            int s = scanner.nextInt();
+            scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
+
+            int[] result = bfs(n, m, edges, s);
+
+            for (int i = 0; i < result.length; i++) {
+                bufferedWriter.write(String.valueOf(result[i]));
+
+                if (i != result.length - 1) {
+                    bufferedWriter.write(" ");
+                }
+            }
+
+            bufferedWriter.newLine();
+        }
+
+        bufferedWriter.close();
+
+        scanner.close();
+    }
+}
